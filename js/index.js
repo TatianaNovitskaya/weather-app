@@ -7,6 +7,16 @@ let currentCountry = document.querySelector(".country");
 function setCity() {
   let inputSearch = document.querySelector(".input-search");
   let btnSearch = document.querySelector(".btn-search");
+  inputSearch.addEventListener("keyup", (e)=>{
+    if(e.key === "Enter"){
+      let inputValue = inputSearch.value.toLowerCase();
+      inputSearch.value = "";
+      let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${inputValue}&units=metric&appid=${apiKey}`
+      getAxiosUrl(apiUrl);
+    }
+
+
+  })
   btnSearch.addEventListener("click", function () {
     let inputValue = inputSearch.value.toLowerCase();
     let cityFirstLetterUpper =
