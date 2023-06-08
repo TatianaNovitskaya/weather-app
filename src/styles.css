@@ -41,6 +41,7 @@
   height: 35px;
   margin-right: 10px;
   width: 35px;
+  cursor: pointer;
 }
 
 .input-search {

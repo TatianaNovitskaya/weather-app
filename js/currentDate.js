@@ -1,3 +1,6 @@
+document.addEventListener("DOMContentLoaded", ()=>{
+  formatDate(new Date());
+})
 function formatDate() {
   let currentDate = document.querySelector(".today-date");
   let now = new Date();
@@ -15,4 +18,4 @@ function formatDate() {
   let currentDateFormat = currentDate;
   return currentDateFormat;
 }
-formatDate(new Date());
+
