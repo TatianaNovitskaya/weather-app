@@ -4,7 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let mainDiv = document.querySelector(".main");
     let currentCity = document.querySelector(".city");
     let currentCountry = document.querySelector(".country");
-
+    let weatherIcon = document.querySelector(".weather-pic")
+    let weatherDiscription = document.querySelector(".weather-temp-description")
     setCity();
     groupEvents();
     getCurrentLocation();
@@ -50,8 +51,12 @@ document.addEventListener("DOMContentLoaded", () => {
     function changeBackground(response) {
         let [weatherCondition] = response.data.weather;
         let weatherConditionLowercase = weatherCondition.main.toLowerCase()
-        let currentWeatherCondition = weatherConditions[weatherConditionLowercase];
+        let currentWeatherCondition = weatherConditionsBg[weatherConditionLowercase];
+        let currentWeatherConditionIcon = weatherConditionsIcons[weatherConditionLowercase];
         mainDiv.style.backgroundImage = currentWeatherCondition;
+        weatherIcon.src = currentWeatherConditionIcon;
+        weatherDiscription.innerText = weatherCondition.main;
+        //console.log(response)
     }
 
     function getPosition(position) {
@@ -82,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
         currentCountry.innerText = response.data.sys.country;
     }
 
-    const weatherConditions = {
+    const weatherConditionsBg = {
         clear: "url('./images/clear-sky.jpg')",
         clouds: "url('./images/clouds.jpg')",
         rain: "url('./images/shower-rain2.jpg')",
@@ -90,5 +95,15 @@ document.addEventListener("DOMContentLoaded", () => {
         thunderstorm: "url('./images/lightning.jpg')",
         snow: "url('./images/snowing.jpg')",
         mist: "url('./images/mist.jpg')",
+    }
+
+    const weatherConditionsIcons = {
+        clear: "./images/sunny.png",
+        clouds: "./images/clouds.png",
+        rain: "./images/rain.png",
+        drizzle: "./images/drizzle.png",
+        thunderstorm: "./images/storm.png",
+        snow: "./images/snow.png",
+        mist: "./images/fog.png",
     }
 })
