@@ -5,7 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentCity = document.querySelector(".city");
     let currentCountry = document.querySelector(".country");
     let weatherIcon = document.querySelector(".weather-pic")
-    let weatherDiscription = document.querySelector(".weather-temp-description")
+    let weatherDiscription = document.querySelector(".weather-temp-description");
+    let feelsLikeTemperature = document.querySelector(".feels-like")
+    let humidity = document.querySelector(".humidity")
+    let wind = document.querySelector(".wind")
     setCity();
     groupEvents();
     getCurrentLocation();
@@ -45,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function getCurrentTemperature(response) {
         let newCurrentTemperature = Math.floor(response.data.main.temp);
-        currentTempInCelsius.innerText = newCurrentTemperature;
+        currentTempInCelsius.innerText = `${newCurrentTemperature}°`;
     }
 
     function changeBackground(response) {
@@ -59,6 +62,16 @@ document.addEventListener("DOMContentLoaded", () => {
         //console.log(response)
     }
 
+    function getWeatherInfo(response){
+        console.log(response)
+        let feelsLikeCurrentTemp = Math.floor(response.data.main.feels_like);
+        let windSpeed = Math.floor(response.data.wind.speed);
+
+        feelsLikeTemperature.innerText =`${feelsLikeCurrentTemp}°`;
+        humidity.innerText = `${response.data.main.humidity}%`;
+        wind.innerText = `${windSpeed} km/h`;
+
+    }
     function getPosition(position) {
         let currentLatitude = position.coords.latitude;
         let currentLongitude = position.coords.longitude;
@@ -74,7 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
         axios.get(apiUrl).then((response) => {
             getCurrentTemperature(response);
             setCurrentCity(response);
-            changeBackground(response)
+            changeBackground(response);
+            getWeatherInfo(response)
         })
             .catch(function (error) {
                 myModal.show()
