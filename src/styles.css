@@ -216,7 +216,9 @@
 .weather-app-forecast {
     margin-top: 35px;
 }
-
+.weather-app-forecast .row{
+    padding: 0;
+}
 .forecast-title {
     margin-bottom: 20px;
     text-align: center;
@@ -233,7 +235,7 @@
     border-radius: 25px;
     -webkit-box-shadow: 2px 2px 10px #999;
     box-shadow: 2px 2px 10px #999;
-    margin: 0 20px;
+    margin: 0 10px;
     padding: 5px 0;
     width: 63px;
 }
