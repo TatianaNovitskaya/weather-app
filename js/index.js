@@ -8,7 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let weatherDiscription = document.querySelector(".weather-temp-description");
     let feelsLikeTemperature = document.querySelector(".feels-like")
     let humidity = document.querySelector(".humidity")
-    let wind = document.querySelector(".wind")
+    let wind = document.querySelector(".wind");
+    let celsiusTemperature = null;
     setCity();
     groupEvents();
     getCurrentLocation();
@@ -47,8 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function getCurrentTemperature(response) {
-        let newCurrentTemperature = Math.floor(response.data.main.temp);
-        currentTempInCelsius.innerText = `${newCurrentTemperature}°`;
+        celsiusTemperature = Math.floor(response.data.main.temp);
+        currentTempInCelsius.innerText = `${celsiusTemperature}°`;
     }
 
     function changeBackground(response) {
@@ -59,19 +60,19 @@ document.addEventListener("DOMContentLoaded", () => {
         mainDiv.style.backgroundImage = currentWeatherCondition;
         weatherIcon.src = currentWeatherConditionIcon;
         weatherDiscription.innerText = weatherCondition.main;
-        //console.log(response)
     }
 
-    function getWeatherInfo(response){
+    function getWeatherInfo(response) {
         console.log(response)
         let feelsLikeCurrentTemp = Math.floor(response.data.main.feels_like);
         let windSpeed = Math.floor(response.data.wind.speed);
 
-        feelsLikeTemperature.innerText =`${feelsLikeCurrentTemp}°`;
+        feelsLikeTemperature.innerText = `${feelsLikeCurrentTemp}°`;
         humidity.innerText = `${response.data.main.humidity}%`;
         wind.innerText = `${windSpeed} km/h`;
 
     }
+
     function getPosition(position) {
         let currentLatitude = position.coords.latitude;
         let currentLongitude = position.coords.longitude;
@@ -120,4 +121,24 @@ document.addEventListener("DOMContentLoaded", () => {
         snow: "./images/snow.png",
         mist: "./images/fog.png",
     }
+
+    function changeToFahrengeit() {
+        let fahrengeitTemperature = Math.round((celsiusTemperature * 9 / 5) + 32);
+        currentTempInCelsius.innerText = `${fahrengeitTemperature}°`;
+        celsiusElement.classList.remove("active-convert");
+        fahrenheitElement.classList.add("active-convert");
+    }
+
+    function changeToCelsius() {
+
+        currentTempInCelsius.innerText = `${celsiusTemperature}°`;
+        celsiusElement.classList.add("active-convert");
+        fahrenheitElement.classList.remove("active-convert");
+    }
+
+    let fahrenheitElement = document.querySelector(".fahrenheit");
+    fahrenheitElement.addEventListener("click", changeToFahrengeit)
+    let celsiusElement = document.querySelector(".celsius");
+    celsiusElement.addEventListener("click", changeToCelsius)
+
 })
