@@ -55,9 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
         let [weatherCondition] = response.data.weather;
         let weatherConditionLowercase = weatherCondition.main.toLowerCase()
         let currentWeatherCondition = weatherConditionsBg[weatherConditionLowercase];
-        let currentWeatherConditionIcon = weatherConditionsIcons[weatherConditionLowercase];
         mainDiv.style.backgroundImage = currentWeatherCondition;
-        weatherIcon.src = currentWeatherConditionIcon;
+        weatherIcon.src = conditionsIcons(weatherConditionLowercase);
         weatherDiscription.innerText = weatherCondition.main;
     }
 
@@ -79,10 +78,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-    function displayForecast(coordinates){
-        console.log(coordinates)
+    function displayForecast(coordinates) {
         let apiKey = "0df6a9dd1987o3afdebba40233td58aa";
-        let apiUrl = `https://api.shecodes.io/weather/v1/forecast?lon=${coordinates.lon}&lat=${coordinates.lat}&key=${apiKey}`;
+        let apiUrl = `https://api.shecodes.io/weather/v1/forecast?lon=${coordinates.lon}&lat=${coordinates.lat}&key=${apiKey}&units=metric`;
         axios.get(apiUrl).then(displayForecastHTML)
     }
 
@@ -105,15 +103,37 @@ document.addEventListener("DOMContentLoaded", () => {
         snow: "url('./images/snowing.jpg')",
         mist: "url('./images/mist.jpg')",
     }
+    function conditionsIcons(icon) {
+        let descriptionToLowercase = icon.toLowerCase();
+        let iconUrl = "";
+       switch (descriptionToLowercase) {
+           case "clear": case "clear-sky-day":
+               iconUrl = "./images/sunny.png";
+               break;
+           case "few-clouds-day":
+               iconUrl = "./images/cloudy-sun.png";
+               break;
+           case "clouds": case "broken-clouds-day": case "scattered-clouds-day":
+               iconUrl = "./images/clouds.png";
+               break;
+           case "rain": case"shower-rain-day":
+               iconUrl = "./images/rain.png";
+               break;
+           case "drizzle": case "rain-day":
+               iconUrl = "./images/drizzle.png";
+               break;
+           case "thunderstorm": case "thunderstorm-day":
+               iconUrl = "./images/clouds.png";
+               break;
+           case  "snow": case "snow-day":
+               iconUrl = "./images/clouds.png";
+               break;
+           case "mist": case "mist-day":
+               iconUrl = "./images/clouds.png";
+               break;
 
-    const weatherConditionsIcons = {
-        clear: "./images/sunny.png",
-        clouds: "./images/clouds.png",
-        rain: "./images/rain.png",
-        drizzle: "./images/drizzle.png",
-        thunderstorm: "./images/storm.png",
-        snow: "./images/snow.png",
-        mist: "./images/fog.png",
+       }
+       return iconUrl
     }
 
     function changeToFahrengeit() {
@@ -122,36 +142,42 @@ document.addEventListener("DOMContentLoaded", () => {
         celsiusElement.classList.remove("active-convert");
         fahrenheitElement.classList.add("active-convert");
     }
+
     function changeToCelsius() {
         currentTempInCelsius.innerText = `${celsiusTemperature}°`;
         celsiusElement.classList.add("active-convert");
         fahrenheitElement.classList.remove("active-convert");
     }
 
+    function convertDays(miliseconds) {
+        let date = new Date(miliseconds * 1000);
+        let day = new Intl.DateTimeFormat("en-US", {weekday: "short"}).format(date);
+        return day
+    }
 
     function displayForecastHTML(response) {
-        console.log(response);
-
+        let forecastWeather = response.data.daily;
         let forecastElement = document.querySelector(".forecast");
         let forecastHTML = "";
-        let countForecastDays = 7;
-        for (let i = 1; i <= countForecastDays; i++) {
-            forecastHTML = forecastHTML + `<div class="col-1 forecast-item ">
+        forecastWeather.forEach(function (forecastDay) {
+            forecastHTML += `<div class="col-1 forecast-item ">
                         <div class="forecast-item-day">
-                            <p>Tue</p>
+                            <p>${convertDays(forecastDay.time)}</p>
                         </div>
                         <div class="forecast-item-icon">
-                            <img src="images/clouds.png" alt="">
+                            <img src="${conditionsIcons(forecastDay.condition.icon)}" alt="">
                         </div>
                         <div class="forecast-item-temp-max">
-                            <p>8 <span>&#176</span></p>
+                            <p>${Math.round(forecastDay.temperature.maximum)} °</p>
                         </div>
                         <div class="forecast-item-temp-min">
-                            <p>2 <span>&#176</span></p>
+                            <p>${Math.round(forecastDay.temperature.minimum)} °</p>
                         </div>
                     </div>`;
-            forecastElement.innerHTML = forecastHTML;
-        }
+            
+        })
+
+        forecastElement.innerHTML = forecastHTML;
 
     }
 
@@ -167,7 +193,6 @@ document.addEventListener("DOMContentLoaded", () => {
             setCurrentCity(response);
             changeBackground(response);
             getWeatherInfo(response);
-            displayForecastHTML(response);
             displayForecast(response.data.coord)
         })
             .catch(function (error) {
