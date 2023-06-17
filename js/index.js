@@ -1,15 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let currentTempInCelsius = document.querySelector(".show-temperature");
-    let apiKey = "a9573fb89158f89d83ceea2936963385";
-    let mainDiv = document.querySelector(".main");
-    let currentCity = document.querySelector(".city");
-    let currentCountry = document.querySelector(".country");
-    let weatherIcon = document.querySelector(".weather-pic")
-    let weatherDiscription = document.querySelector(".weather-temp-description");
-    let feelsLikeTemperature = document.querySelector(".feels-like")
-    let humidity = document.querySelector(".humidity")
-    let wind = document.querySelector(".wind");
+    const currentTempInCelsius = document.querySelector(".show-temperature");
+    const apiKey = "a9573fb89158f89d83ceea2936963385";
+    const mainDiv = document.querySelector(".main");
+    const currentCity = document.querySelector(".city");
+    const currentCountry = document.querySelector(".country");
+    const weatherIcon = document.querySelector(".weather-pic")
+    const weatherDiscription = document.querySelector(".weather-temp-description");
+    const feelsLikeTemperature = document.querySelector(".feels-like")
+    const humidity = document.querySelector(".humidity")
+    const wind = document.querySelector(".wind");
     let celsiusTemperature = null;
+    const forecastElement = document.querySelector(".forecast");
+    let forecastData = [];
     setCity();
     groupEvents();
     getCurrentLocation();
@@ -81,7 +83,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function displayForecast(coordinates) {
         let apiKey = "0df6a9dd1987o3afdebba40233td58aa";
         let apiUrl = `https://api.shecodes.io/weather/v1/forecast?lon=${coordinates.lon}&lat=${coordinates.lat}&key=${apiKey}&units=metric`;
-        axios.get(apiUrl).then(displayForecastHTML)
+
+        axios.get(apiUrl).then((response)=>{
+            forecastData = response.data.daily;
+            displayForecastHTML();
+
+        });
+
+
     }
 
     const myModal = new bootstrap.Modal(document.getElementById('myModal'), {
@@ -103,51 +112,48 @@ document.addEventListener("DOMContentLoaded", () => {
         snow: "url('./images/snowing.jpg')",
         mist: "url('./images/mist.jpg')",
     }
+
     function conditionsIcons(icon) {
         let descriptionToLowercase = icon.toLowerCase();
         let iconUrl = "";
-       switch (descriptionToLowercase) {
-           case "clear": case "clear-sky-day":
-               iconUrl = "./images/sunny.png";
-               break;
-           case "few-clouds-day":
-               iconUrl = "./images/cloudy-sun.png";
-               break;
-           case "clouds": case "broken-clouds-day": case "scattered-clouds-day":
-               iconUrl = "./images/clouds.png";
-               break;
-           case "rain": case"shower-rain-day":
-               iconUrl = "./images/rain.png";
-               break;
-           case "drizzle": case "rain-day":
-               iconUrl = "./images/drizzle.png";
-               break;
-           case "thunderstorm": case "thunderstorm-day":
-               iconUrl = "./images/clouds.png";
-               break;
-           case  "snow": case "snow-day":
-               iconUrl = "./images/clouds.png";
-               break;
-           case "mist": case "mist-day":
-               iconUrl = "./images/clouds.png";
-               break;
+        switch (descriptionToLowercase) {
+            case "clear":
+            case "clear-sky-day":
+                iconUrl = "./images/sunny.png";
+                break;
+            case "few-clouds-day":
+                iconUrl = "./images/cloudy-sun.png";
+                break;
+            case "clouds":
+            case "broken-clouds-day":
+            case "scattered-clouds-day":
+                iconUrl = "./images/clouds.png";
+                break;
+            case "rain":
+            case"shower-rain-day":
+                iconUrl = "./images/rain.png";
+                break;
+            case "drizzle":
+            case "rain-day":
+                iconUrl = "./images/drizzle.png";
+                break;
+            case "thunderstorm":
+            case "thunderstorm-day":
+                iconUrl = "./images/clouds.png";
+                break;
+            case  "snow":
+            case "snow-day":
+                iconUrl = "./images/clouds.png";
+                break;
+            case "mist":
+            case "mist-day":
+                iconUrl = "./images/clouds.png";
+                break;
 
-       }
-       return iconUrl
+        }
+        return iconUrl
     }
 
-    function changeToFahrengeit() {
-        let fahrengeitTemperature = Math.round((celsiusTemperature * 9 / 5) + 32);
-        currentTempInCelsius.innerText = `${fahrengeitTemperature}°`;
-        celsiusElement.classList.remove("active-convert");
-        fahrenheitElement.classList.add("active-convert");
-    }
-
-    function changeToCelsius() {
-        currentTempInCelsius.innerText = `${celsiusTemperature}°`;
-        celsiusElement.classList.add("active-convert");
-        fahrenheitElement.classList.remove("active-convert");
-    }
 
     function convertDays(miliseconds) {
         let date = new Date(miliseconds * 1000);
@@ -155,11 +161,9 @@ document.addEventListener("DOMContentLoaded", () => {
         return day
     }
 
-    function displayForecastHTML(response) {
-        let forecastWeather = response.data.daily;
-        let forecastElement = document.querySelector(".forecast");
+    function displayForecastHTML(units) {
         let forecastHTML = "";
-        forecastWeather.forEach(function (forecastDay) {
+        forecastData.forEach(function (forecastDay) {
             forecastHTML += `<div class="col-1 forecast-item ">
                         <div class="forecast-item-day">
                             <p>${convertDays(forecastDay.time)}</p>
@@ -168,23 +172,18 @@ document.addEventListener("DOMContentLoaded", () => {
                             <img src="${conditionsIcons(forecastDay.condition.icon)}" alt="">
                         </div>
                         <div class="forecast-item-temp-max">
-                            <p>${Math.round(forecastDay.temperature.maximum)} °</p>
+                            <p>${toggleTemperature(units, forecastDay.temperature.maximum)} °</p>
                         </div>
                         <div class="forecast-item-temp-min">
-                            <p>${Math.round(forecastDay.temperature.minimum)} °</p>
+                            <p>${toggleTemperature(units, forecastDay.temperature.minimum)} °</p>
                         </div>
                     </div>`;
-            
+
         })
 
         forecastElement.innerHTML = forecastHTML;
 
     }
-
-    let fahrenheitElement = document.querySelector(".fahrenheit");
-    fahrenheitElement.addEventListener("click", changeToFahrengeit)
-    let celsiusElement = document.querySelector(".celsius");
-    celsiusElement.addEventListener("click", changeToCelsius);
 
 
     function getAxiosUrl(apiUrl) {
@@ -198,5 +197,42 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch(function (error) {
                 myModal.show()
             })
+    }
+
+    function displayFahrengeit() {
+        let fahrengeitTemperature = conversionFahrenheit(celsiusTemperature)
+        currentTempInCelsius.innerText = `${fahrengeitTemperature}°`;
+        celsiusElement.classList.remove("active-convert");
+        fahrenheitElement.classList.add("active-convert");
+        displayForecastHTML("fahrenheit")
+    }
+
+    function displayCelsius() {
+        currentTempInCelsius.innerText = `${celsiusTemperature}°`;
+        celsiusElement.classList.add("active-convert");
+        fahrenheitElement.classList.remove("active-convert");
+        displayForecastHTML("celsius")
+    }
+
+    let fahrenheitElement = document.querySelector(".fahrenheit");
+    fahrenheitElement.addEventListener("click", displayFahrengeit)
+    let celsiusElement = document.querySelector(".celsius");
+    celsiusElement.addEventListener("click", displayCelsius);
+
+    function conversionFahrenheit(num) {
+        return Math.round((num * 9 / 5) + 32);
+    }
+
+    function conversionCelsius(num) {
+        return Math.round(num)
+    }
+
+    function toggleTemperature(unit, number) {
+        if(unit === "fahrenheit"){
+            return conversionFahrenheit(number)
+        } else {
+            return conversionCelsius(number)
+        }
+
     }
 })
