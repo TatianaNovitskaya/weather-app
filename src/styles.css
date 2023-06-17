@@ -253,6 +253,7 @@
 .forecast-item-icon {
     margin: 5px auto 0;
     width: 35px;
+    height: 35px
 }
 
 .forecast-item-temp-max {
