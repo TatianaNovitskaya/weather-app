@@ -12,9 +12,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let celsiusTemperature = null;
     const forecastElement = document.querySelector(".forecast");
     let forecastData = [];
+
     setCity();
     groupEvents();
     getCurrentLocation();
+
+    function getStorageTemperarure() {
+        return localStorage.getItem("temperature");
+    }
 
     function getCurrentLocation() {
         navigator.geolocation.getCurrentPosition(getPosition);
@@ -161,7 +166,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return day
     }
 
-    function displayForecastHTML(units) {
+    function displayForecastHTML() {
+
         let forecastHTML = "";
         forecastData.forEach(function (forecastDay) {
             forecastHTML += `<div class="col-1 forecast-item ">
@@ -172,10 +178,10 @@ document.addEventListener("DOMContentLoaded", () => {
                             <img src="${conditionsIcons(forecastDay.condition.icon)}" alt="">
                         </div>
                         <div class="forecast-item-temp-max">
-                            <p>${toggleTemperature(units, forecastDay.temperature.maximum)} °</p>
+                            <p>${toggleTemperature(forecastDay.temperature.maximum)} °</p>
                         </div>
                         <div class="forecast-item-temp-min">
-                            <p>${toggleTemperature(units, forecastDay.temperature.minimum)} °</p>
+                            <p>${toggleTemperature(forecastDay.temperature.minimum)} °</p>
                         </div>
                     </div>`;
 
@@ -192,7 +198,11 @@ document.addEventListener("DOMContentLoaded", () => {
             setCurrentCity(response);
             changeBackground(response);
             getWeatherInfo(response);
-            displayForecast(response.data.coord)
+            displayForecast(response.data.coord);
+
+            if(getStorageTemperarure() === "fahrenheit"){
+                displayFahrengeit();
+            }
         })
             .catch(function (error) {
                 myModal.show()
@@ -204,20 +214,26 @@ document.addEventListener("DOMContentLoaded", () => {
         currentTempInCelsius.innerText = `${fahrengeitTemperature}°`;
         celsiusElement.classList.remove("active-convert");
         fahrenheitElement.classList.add("active-convert");
-        displayForecastHTML("fahrenheit")
+        displayForecastHTML()
     }
 
     function displayCelsius() {
         currentTempInCelsius.innerText = `${celsiusTemperature}°`;
         celsiusElement.classList.add("active-convert");
         fahrenheitElement.classList.remove("active-convert");
-        displayForecastHTML("celsius")
+        displayForecastHTML()
     }
 
     let fahrenheitElement = document.querySelector(".fahrenheit");
-    fahrenheitElement.addEventListener("click", displayFahrengeit)
+    fahrenheitElement.addEventListener("click", ()=>{
+        localStorage.setItem("temperature","fahrenheit");
+        displayFahrengeit()
+    })
     let celsiusElement = document.querySelector(".celsius");
-    celsiusElement.addEventListener("click", displayCelsius);
+    celsiusElement.addEventListener("click", ()=>{
+        localStorage.setItem("temperature","celsius")
+        displayCelsius()
+    });
 
     function conversionFahrenheit(num) {
         return Math.round((num * 9 / 5) + 32);
@@ -227,12 +243,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return Math.round(num)
     }
 
-    function toggleTemperature(unit, number) {
-        if(unit === "fahrenheit"){
+    function toggleTemperature(number) {
+
+        if(getStorageTemperarure() === "fahrenheit"){
             return conversionFahrenheit(number)
         } else {
             return conversionCelsius(number)
         }
 
     }
+
 })
